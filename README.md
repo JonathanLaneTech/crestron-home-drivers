@@ -1,5 +1,7 @@
 # Crestron Home drivers
 
+[![CI](https://github.com/JonathanLaneTech/crestron-home-drivers/actions/workflows/ci.yml/badge.svg)](https://github.com/JonathanLaneTech/crestron-home-drivers/actions/workflows/ci.yml)
+
 Yamaha **R-N2000A** and **Roon Core** drivers for Crestron Home. They are separate products in this repo: volume and AVR control stay on Yamaha; Roon is transport and now playing.
 
 This project was built with [Cursor](https://cursor.com).

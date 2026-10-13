@@ -1,0 +1,20 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  test:
+    name: Build and test Yamaha YXC client
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Test
+        run: dotnet test Yamaha/tests/Yamaha.Yxc.Tests/Yamaha.Yxc.Tests.csproj --configuration Release --logger "console;verbosity=normal"

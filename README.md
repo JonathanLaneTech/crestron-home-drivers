@@ -17,7 +17,7 @@ Crestron SDK assemblies referenced from NuGet are licensed by Crestron, not by t
 
 ## Yamaha R-N2000A
 
-Crestron Home does not ship a driver for this receiver. Many Yamaha units speak **YNCA** on TCP port 50000. The R-N2000A does not; it speaks **Yamaha Extended Control (YXC)** — HTTP GET and JSON on port **80**.
+Crestron Home does not ship a driver for this receiver. Many Yamaha units speak **YNCA** on TCP port 50000. The R-N2000A does not; it speaks **Yamaha Extended Control (YXC)**: HTTP GET and JSON on port **80**.
 
 This driver is a Home **AV Receiver** that uses YXC so the room can power, volume, mute, and switch inputs, including the USB DAC path used with Roon.
 
@@ -36,8 +36,8 @@ Roon’s official Crestron module is SIMPL-oriented. These packages talk to a Ro
 
 Home cannot put a full Roon UI and a routeable source on one third-party device type, so there are two packages:
 
-1. **Streaming Player** (`Roon.Crestron.pkg`) — appears as a room **source**. Route its analog output to the Yamaha **USB DAC** input. Play / pause / skip.
-2. **Media Player** (`Roon.Ui.Crestron.pkg`) — optional **Roon Now Playing** tile (track, artist, album, time, transport). Not a source.
+1. **Streaming Player** (`Roon.Crestron.pkg`): appears as a room **source**. Route its analog output to the Yamaha **USB DAC** input. Play / pause / skip.
+2. **Media Player** (`Roon.Ui.Crestron.pkg`): optional **Roon Now Playing** tile (track, artist, album, time, transport). Not a source.
 
 Enable each extension once in Roon → Settings → Extensions (**Cadence Works Crestron Roon** and, if you use the tile, **Cadence Works Crestron Roon iPad**). Volume stays on the Yamaha driver.
 
@@ -66,6 +66,17 @@ Packages land in each project’s `pkg\` folder. Building requires [ManifestUtil
 - Roon Core on the LAN if you use the Roon packages
 - Driver projects: **.NET Framework 4.7.2**, `Crestron.DeviceDrivers.DevKit` **27.0.24**, `Crestron.SimplSharp.SDK.Library` **2.21.90**
 - Packaging tested with Crestron Drivers SDK **28.0000.0015** (`ManifestUtil`)
+
+## How this was built
+
+I designed the architecture, investigated the Crestron SDK, and tested on real hardware. Much of the code was generated with AI tools under my direction, then reviewed, debugged, and verified by me. Two decisions shaped the Yamaha driver:
+
+- **RAD (V1) instead of the Entity Model (V2).** AV receiver routing is built and tested almost exclusively on RAD, and the V2 capability needed for routing is not present in the publicly available SDK (confirmed by inspecting the compiled SDK assemblies).
+- **Bridging HTTP into a socket framework.** RAD expects a text protocol over a persistent connection; YXC is HTTP and JSON. A standalone `YxcClient` talks to the receiver directly, a poller feeds state changes back into RAD, and the rest of the framework (feedback, routing) behaves as it would for any AVR driver.
+
+## Testing
+
+`YxcClient` has no Crestron dependencies, so it is covered by a standalone xUnit test project (`Yamaha/tests/Yamaha.Yxc.Tests`) that runs without hardware. GitHub Actions builds and runs the tests on every push. Final validation is done against a real R-N2000A.
 
 ## Known limitations (Crestron Home SDK)
 
